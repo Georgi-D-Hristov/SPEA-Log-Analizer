@@ -53,10 +53,11 @@
                             <VerticalStackLayout Spacing="2">
                                 <Label Text="{Binding Channel, StringFormat='Board {0}'}"
                                        FontSize="14"
-                                       FontAttributes="Bold" />
+                                       FontAttributes="Bold"
+                                       TextColor="#222222" />
                                 <Label Text="{Binding SerialNumber}"
                                        FontSize="11"
-                                       TextColor="{StaticResource Gray400}" />
+                                       TextColor="#555555" />
                                 <Label Text="{Binding ResultDisplay}"
                                        FontSize="14"
                                        FontAttributes="Bold"
@@ -115,20 +116,21 @@
             <Grid RowDefinitions="Auto,*">
 
                 <!-- Table Header -->
-                <Grid ColumnDefinitions="50,50,120,60,*,80,120,120,120,60"
-                      Padding="12,10"
+                <Grid ColumnDefinitions="6,50,50,120,60,*,100,100,100,60,60"
+                      Padding="0,10,12,10"
                       BackgroundColor="{StaticResource Primary}"
                       ColumnSpacing="4">
-                    <Label Text="Type" FontSize="11" FontAttributes="Bold" TextColor="White" />
-                    <Label Grid.Column="1" Text="Ch" FontSize="11" FontAttributes="Bold" TextColor="White" />
-                    <Label Grid.Column="2" Text="Component" FontSize="11" FontAttributes="Bold" TextColor="White" />
-                    <Label Grid.Column="3" Text="Result" FontSize="11" FontAttributes="Bold" TextColor="White" />
-                    <Label Grid.Column="4" Text="Description" FontSize="11" FontAttributes="Bold" TextColor="White" />
-                    <Label Grid.Column="5" Text="Measured" FontSize="11" FontAttributes="Bold" TextColor="White" />
-                    <Label Grid.Column="6" Text="Low Limit" FontSize="11" FontAttributes="Bold" TextColor="White" />
-                    <Label Grid.Column="7" Text="High Limit" FontSize="11" FontAttributes="Bold" TextColor="White" />
-                    <Label Grid.Column="8" Text="Unit" FontSize="11" FontAttributes="Bold" TextColor="White" />
-                    <Label Grid.Column="9" Text="Step" FontSize="11" FontAttributes="Bold" TextColor="White" />
+                    <BoxView Grid.Column="0" Color="{StaticResource Primary}" WidthRequest="6" />
+                    <Label Grid.Column="1" Text="Type" FontSize="11" FontAttributes="Bold" TextColor="White" />
+                    <Label Grid.Column="2" Text="Ch" FontSize="11" FontAttributes="Bold" TextColor="White" />
+                    <Label Grid.Column="3" Text="Component" FontSize="11" FontAttributes="Bold" TextColor="White" />
+                    <Label Grid.Column="4" Text="Result" FontSize="11" FontAttributes="Bold" TextColor="White" />
+                    <Label Grid.Column="5" Text="Description" FontSize="11" FontAttributes="Bold" TextColor="White" />
+                    <Label Grid.Column="6" Text="Measured" FontSize="11" FontAttributes="Bold" TextColor="White" />
+                    <Label Grid.Column="7" Text="Low Limit" FontSize="11" FontAttributes="Bold" TextColor="White" />
+                    <Label Grid.Column="8" Text="High Limit" FontSize="11" FontAttributes="Bold" TextColor="White" />
+                    <Label Grid.Column="9" Text="Unit" FontSize="11" FontAttributes="Bold" TextColor="White" />
+                    <Label Grid.Column="10" Text="Step" FontSize="11" FontAttributes="Bold" TextColor="White" />
                 </Grid>
 
                 <!-- Table Body -->
@@ -136,25 +138,43 @@
                                 ItemsSource="{Binding FilteredMeasurements}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:TestMeasurement">
-                            <Grid ColumnDefinitions="50,50,120,60,*,80,120,120,120,60"
-                                  Padding="12,6"
-                                  ColumnSpacing="4"
-                                  Background="{Binding Result, Converter={StaticResource ResultToBackgroundConverter}}">
-                                <Label Text="{Binding RecordType}" FontSize="11" />
-                                <Label Grid.Column="1" Text="{Binding Channel}" FontSize="11" />
-                                <Label Grid.Column="2" Text="{Binding ComponentName}" FontSize="11" FontAttributes="Bold" />
-                                <Label Grid.Column="3"
-                                       Text="{Binding ResultDisplay}"
-                                       FontSize="11"
-                                       FontAttributes="Bold"
-                                       TextColor="{Binding Result, Converter={StaticResource ResultToColorConverter}}" />
-                                <Label Grid.Column="4" Text="{Binding Description}" FontSize="10" LineBreakMode="TailTruncation" />
-                                <Label Grid.Column="5" Text="{Binding MeasuredValue, StringFormat='{0:G5}'}" FontSize="11" />
-                                <Label Grid.Column="6" Text="{Binding LowLimit, StringFormat='{0:G5}'}" FontSize="11" TextColor="{StaticResource Gray400}" />
-                                <Label Grid.Column="7" Text="{Binding HighLimit, StringFormat='{0:G5}'}" FontSize="11" TextColor="{StaticResource Gray400}" />
-                                <Label Grid.Column="8" Text="{Binding Unit}" FontSize="11" />
-                                <Label Grid.Column="9" Text="{Binding StepNumber}" FontSize="11" TextColor="{StaticResource Gray400}" />
-                            </Grid>
+                            <Border StrokeThickness="0"
+                                    Padding="0"
+                                    Margin="0,0,0,1"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#2D2D2D}">
+                                <Grid ColumnDefinitions="6,50,50,120,60,*,100,100,100,60,60"
+                                      Padding="0,6,12,6"
+                                      ColumnSpacing="4">
+                                    <!-- Color indicator strip -->
+                                    <BoxView Grid.Column="0"
+                                             Color="{Binding Result, Converter={StaticResource ResultToColorConverter}}"
+                                             WidthRequest="6"
+                                             VerticalOptions="Fill" />
+                                    <Label Grid.Column="1" Text="{Binding RecordType}" FontSize="11"
+                                           TextColor="{AppThemeBinding Light=#333333, Dark=#E0E0E0}" />
+                                    <Label Grid.Column="2" Text="{Binding Channel}" FontSize="11"
+                                           TextColor="{AppThemeBinding Light=#333333, Dark=#E0E0E0}" />
+                                    <Label Grid.Column="3" Text="{Binding ComponentName}" FontSize="11" FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#111111, Dark=#FFFFFF}" />
+                                    <Label Grid.Column="4"
+                                           Text="{Binding ResultDisplay}"
+                                           FontSize="11"
+                                           FontAttributes="Bold"
+                                           TextColor="{Binding Result, Converter={StaticResource ResultToColorConverter}}" />
+                                    <Label Grid.Column="5" Text="{Binding Description}" FontSize="10" LineBreakMode="TailTruncation"
+                                           TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}" />
+                                    <Label Grid.Column="6" Text="{Binding MeasuredValue, StringFormat='{0:G5}'}" FontSize="11"
+                                           TextColor="{AppThemeBinding Light=#111111, Dark=#FFFFFF}" />
+                                    <Label Grid.Column="7" Text="{Binding LowLimit, StringFormat='{0:G5}'}" FontSize="11"
+                                           TextColor="{AppThemeBinding Light=#888888, Dark=#999999}" />
+                                    <Label Grid.Column="8" Text="{Binding HighLimit, StringFormat='{0:G5}'}" FontSize="11"
+                                           TextColor="{AppThemeBinding Light=#888888, Dark=#999999}" />
+                                    <Label Grid.Column="9" Text="{Binding Unit}" FontSize="11"
+                                           TextColor="{AppThemeBinding Light=#333333, Dark=#E0E0E0}" />
+                                    <Label Grid.Column="10" Text="{Binding StepNumber}" FontSize="11"
+                                           TextColor="{AppThemeBinding Light=#888888, Dark=#999999}" />
+                                </Grid>
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
