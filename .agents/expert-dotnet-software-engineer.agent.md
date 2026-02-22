@@ -1,1 +1,0 @@
-"When working on WPF projects, strictly follow the guidelines defined in .skills/wpf-mvvm.md."

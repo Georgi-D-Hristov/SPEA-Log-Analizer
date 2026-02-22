@@ -1,0 +1,20 @@
+﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SpeaLogAnalyzer"
+             xmlns:converters="clr-namespace:SpeaLogAnalyzer.Converters"
+             x:Class="SpeaLogAnalyzer.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:TestResultToColorConverter x:Key="ResultToColorConverter" />
+            <converters:TestResultToBackgroundConverter x:Key="ResultToBackgroundConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:PercentToDoubleConverter x:Key="PercentToDoubleConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

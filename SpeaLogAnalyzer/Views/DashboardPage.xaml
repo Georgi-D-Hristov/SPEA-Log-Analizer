@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SpeaLogAnalyzer.ViewModels"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui"
+             x:Class="SpeaLogAnalyzer.Views.DashboardPage"
+             x:DataType="vm:DashboardViewModel"
+             Title="Dashboard"
+             Background="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="20">
+
+            <!-- Header with Load Button -->
+            <Grid ColumnDefinitions="*,Auto" Padding="0,0,0,10">
+                <VerticalStackLayout>
+                    <Label Text="SPEA Log Analyzer"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}" />
+                    <Label Text="{Binding StatusText}"
+                           FontSize="14"
+                           TextColor="{StaticResource Gray400}" />
+                </VerticalStackLayout>
+
+                <Button Grid.Column="1"
+                        Text="📂 Load Folder"
+                        Command="{Binding LoadFolderCommand}"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        HeightRequest="44"
+                        Padding="20,0"
+                        VerticalOptions="Center" />
+            </Grid>
+
+            <!-- Progress Bar -->
+            <ProgressBar Progress="{Binding ProgressPercent, Converter={StaticResource PercentToDoubleConverter}}"
+                         IsVisible="{Binding IsLoading}"
+                         ProgressColor="{StaticResource Primary}"
+                         HeightRequest="6" />
+
+            <!-- Summary Cards -->
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="12"
+                  IsVisible="{Binding HasData}">
+
+                <!-- Total Sessions -->
+                <Border Grid.Column="0"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{StaticResource Gray200}"
+                        StrokeThickness="1"
+                        Background="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}"
+                        Padding="16">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Sessions" FontSize="13" TextColor="{StaticResource Gray400}" />
+                        <Label Text="{Binding TotalSessions}" FontSize="32" FontAttributes="Bold" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Total Boards -->
+                <Border Grid.Column="1"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{StaticResource Gray200}"
+                        StrokeThickness="1"
+                        Background="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}"
+                        Padding="16">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Boards Tested" FontSize="13" TextColor="{StaticResource Gray400}" />
+                        <Label Text="{Binding TotalBoardsTested}" FontSize="32" FontAttributes="Bold" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Passed -->
+                <Border Grid.Column="2"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{StaticResource PassColor}"
+                        StrokeThickness="1"
+                        Background="{StaticResource PassLightColor}"
+                        Padding="16">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Passed" FontSize="13" TextColor="{StaticResource PassColor}" />
+                        <Label Text="{Binding PassedBoardsCount}" FontSize="32" FontAttributes="Bold" TextColor="{StaticResource PassColor}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Failed -->
+                <Border Grid.Column="3"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{StaticResource FailColor}"
+                        StrokeThickness="1"
+                        Background="{StaticResource FailLightColor}"
+                        Padding="16">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Failed" FontSize="13" TextColor="{StaticResource FailColor}" />
+                        <Label Text="{Binding FailedBoardsCount}" FontSize="32" FontAttributes="Bold" TextColor="{StaticResource FailColor}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Yield Card -->
+            <Border StrokeShape="RoundRectangle 12"
+                    Stroke="{StaticResource Gray200}"
+                    StrokeThickness="1"
+                    Background="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}"
+                    Padding="20"
+                    IsVisible="{Binding HasData}">
+                <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
+                    <Label Text="Overall Yield:" FontSize="20" VerticalOptions="Center" />
+                    <Label Text="{Binding OverallYield, StringFormat='{0:F1}%'}"
+                           FontSize="36"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <!-- Charts Row -->
+            <Grid ColumnDefinitions="*,2*"
+                  ColumnSpacing="12"
+                  HeightRequest="320"
+                  IsVisible="{Binding HasData}">
+
+                <!-- Pie Chart -->
+                <Border Grid.Column="0"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{StaticResource Gray200}"
+                        StrokeThickness="1"
+                        Background="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}"
+                        Padding="16">
+                    <VerticalStackLayout>
+                        <Label Text="Pass / Fail Distribution" FontSize="15" FontAttributes="Bold" Margin="0,0,0,8" />
+                        <lvc:PieChart Series="{Binding YieldPieSeries}"
+                                      HeightRequest="260" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Pareto Chart -->
+                <Border Grid.Column="1"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{StaticResource Gray200}"
+                        StrokeThickness="1"
+                        Background="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}"
+                        Padding="16">
+                    <VerticalStackLayout>
+                        <Label Text="Top 10 Failing Components" FontSize="15" FontAttributes="Bold" Margin="0,0,0,8" />
+                        <lvc:CartesianChart Series="{Binding ParetoSeries}"
+                                            XAxes="{Binding ParetoXAxes}"
+                                            YAxes="{Binding ParetoYAxes}"
+                                            HeightRequest="260" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Trend Chart -->
+            <Border StrokeShape="RoundRectangle 12"
+                    Stroke="{StaticResource Gray200}"
+                    StrokeThickness="1"
+                    Background="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}"
+                    Padding="16"
+                    IsVisible="{Binding HasData}">
+                <VerticalStackLayout>
+                    <Label Text="Yield Trend by Date" FontSize="15" FontAttributes="Bold" Margin="0,0,0,8" />
+                    <lvc:CartesianChart Series="{Binding YieldTrendSeries}"
+                                        XAxes="{Binding TrendXAxes}"
+                                        YAxes="{Binding TrendYAxes}"
+                                        HeightRequest="280" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
