@@ -41,6 +41,99 @@
                          ProgressColor="{StaticResource Primary}"
                          HeightRequest="6" />
 
+            <!-- Filters Panel -->
+            <Border StrokeShape="RoundRectangle 10"
+                    Stroke="{StaticResource Gray200}"
+                    StrokeThickness="1"
+                    Background="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}"
+                    Padding="16,12"
+                    IsVisible="{Binding HasData}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="🔍 Filters"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}" />
+
+                    <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*"
+                          ColumnSpacing="10"
+                          RowDefinitions="Auto"
+                          VerticalOptions="Center">
+
+                        <!-- Date From -->
+                        <Label Text="From:"
+                               FontSize="12"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}" />
+                        <DatePicker Grid.Column="1"
+                                    Date="{Binding DateFrom, Mode=TwoWay}"
+                                    Format="yyyy-MM-dd"
+                                    MinimumDate="2020-01-01"
+                                    MaximumDate="2030-12-31"
+                                    VerticalOptions="Center" />
+                        <TimePicker Grid.Column="2"
+                                    Time="{Binding TimeFrom, Mode=TwoWay}"
+                                    Format="HH:mm"
+                                    VerticalOptions="Center" />
+
+                        <!-- Date To -->
+                        <Label Grid.Column="3"
+                               Text="To:"
+                               FontSize="12"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}" />
+                        <DatePicker Grid.Column="4"
+                                    Date="{Binding DateTo, Mode=TwoWay}"
+                                    Format="yyyy-MM-dd"
+                                    MinimumDate="2020-01-01"
+                                    MaximumDate="2030-12-31"
+                                    VerticalOptions="Center" />
+                        <TimePicker Grid.Column="5"
+                                    Time="{Binding TimeTo, Mode=TwoWay}"
+                                    Format="HH:mm"
+                                    VerticalOptions="Center" />
+
+                        <!-- Variant Picker -->
+                        <Label Grid.Column="6"
+                               Text="Variant:"
+                               FontSize="12"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}" />
+                        <Picker Grid.Column="7"
+                                ItemsSource="{Binding AvailableVariants}"
+                                SelectedItem="{Binding SelectedVariant}"
+                                WidthRequest="180"
+                                VerticalOptions="Center" />
+
+                        <!-- Buttons -->
+                        <HorizontalStackLayout Grid.Column="8" Spacing="8" VerticalOptions="Center">
+                            <Button Text="Apply"
+                                    Command="{Binding ApplyFiltersCommand}"
+                                    BackgroundColor="{StaticResource Primary}"
+                                    TextColor="White"
+                                    FontSize="12"
+                                    HeightRequest="34"
+                                    Padding="16,0"
+                                    FontAttributes="Bold" />
+                            <Button Text="✕ Reset"
+                                    Command="{Binding ResetFiltersCommand}"
+                                    BackgroundColor="Transparent"
+                                    BorderColor="{StaticResource Primary}"
+                                    BorderWidth="1"
+                                    TextColor="{StaticResource Primary}"
+                                    FontSize="12"
+                                    HeightRequest="34"
+                                    Padding="16,0" />
+                        </HorizontalStackLayout>
+                    </Grid>
+
+                    <!-- Filter Summary -->
+                    <Label Text="{Binding FilterSummary}"
+                           FontSize="11"
+                           TextColor="{StaticResource Gray400}"
+                           IsVisible="{Binding IsFilterActive}" />
+                </VerticalStackLayout>
+            </Border>
+
             <!-- Summary Cards -->
             <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="12"
                   IsVisible="{Binding HasData}">
