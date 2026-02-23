@@ -1,8 +1,4 @@
-<p align="center">
-  <img src="docs/screenshots/app-icon.png" alt="SPEA Log Analyzer" width="120" />
-</p>
-
-<h1 align="center">SPEA Log Analyzer</h1>
+<h1 align="center">🔬 SPEA Log Analyzer</h1>
 
 <p align="center">
   <strong>Desktop application for loading, parsing, and visualizing SPEA automated test equipment (ATE) log files.</strong>
