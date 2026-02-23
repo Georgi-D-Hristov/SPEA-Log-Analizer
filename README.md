@@ -42,17 +42,22 @@
 ### Dashboard — Filters
 > Filter data by date range, time range, variant, and exclude duplicate serial numbers.
 
-![Dashboard Filters](docs/screenshots/dashboard-filters.png)
+![Dashboard Filters](docs/screenshots/dashboards-filters.png)
 
 ### Test Records
 > Per-board entries with serial number, position badge, retest indicator, and result color coding.
 
 ![Test Records](docs/screenshots/records.png)
 
+### Test Records — Filters
+> Search and filter by serial number, result, and board position.
+
+![Records Filters](docs/screenshots/records-filters.png)
+
 ### Record Detail
 > Drill-down into individual test sessions showing all measurements with result, value, and limits.
 
-![Record Detail](docs/screenshots/record-detail.png)
+![Record Detail](docs/screenshots/records-details.png)
 
 ### Failure Analysis
 > Interactive failure Pareto table with histogram and scatter plot. Click any component to visualize.
@@ -62,10 +67,7 @@
 ### Failure Analysis — Tolerance Changes
 > Automatic detection of limit changes across sessions, with multi-colored limit lines and history panel.
 
-![Tolerance Changes](docs/screenshots/tolerance-changes.png)
-
-> **Note:** Replace the placeholder images above with actual screenshots of the running application.  
-> Save screenshots to the `docs/screenshots/` folder.
+![Tolerance Changes](docs/screenshots/limits-changes.png)
 
 ---
 
