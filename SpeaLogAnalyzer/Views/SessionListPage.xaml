@@ -6,14 +6,14 @@
              xmlns:converters="clr-namespace:SpeaLogAnalyzer.Converters"
              x:Class="SpeaLogAnalyzer.Views.SessionListPage"
              x:DataType="vm:SessionListViewModel"
-             Title="Sessions"
+             Title="Records"
              Background="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
 
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="20" RowSpacing="12">
 
         <!-- Header -->
         <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
-            <Label Text="Test Sessions"
+            <Label Text="Test Records"
                    FontSize="24"
                    FontAttributes="Bold"
                    VerticalOptions="Center" />

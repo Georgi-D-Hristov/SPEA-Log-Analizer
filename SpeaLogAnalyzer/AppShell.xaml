@@ -29,9 +29,9 @@
             Route="DashboardPage" />
     </FlyoutItem>
 
-    <FlyoutItem Title="Sessions" Icon="{x:Null}">
+    <FlyoutItem Title="Records" Icon="{x:Null}">
         <ShellContent
-            Title="Sessions"
+            Title="Records"
             ContentTemplate="{DataTemplate views:SessionListPage}"
             Route="SessionListPage" />
     </FlyoutItem>

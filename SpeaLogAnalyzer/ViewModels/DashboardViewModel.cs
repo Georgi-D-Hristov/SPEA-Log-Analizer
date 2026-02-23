@@ -262,7 +262,7 @@ public partial class DashboardViewModel : ObservableObject
         if (ExcludeDuplicateSerials)
             parts.Add("Unique SNs only");
 
-        FilterSummary = $"Filter: {string.Join(" | ", parts)} — {_filteredSessions.Count}/{_allSessions.Count} sessions";
+        FilterSummary = $"Filter: {string.Join(" | ", parts)} — {_filteredSessions.Count}/{_allSessions.Count} records";
     }
 
     private void UpdateStatistics()

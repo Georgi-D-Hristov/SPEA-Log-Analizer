@@ -119,7 +119,7 @@ public partial class FailureAnalysisViewModel : ObservableObject
             FailureRows = grouped;
             HasData = grouped.Count > 0;
             StatusText = HasData
-                ? $"{grouped.Count} failing components from {sessions.Count} sessions"
+                ? $"{grouped.Count} failing components from {sessions.Count} records"
                 : "No failures found.";
             HasSelection = false;
         }

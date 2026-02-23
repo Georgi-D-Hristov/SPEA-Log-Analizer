@@ -156,7 +156,7 @@
             <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="12"
                   IsVisible="{Binding HasData}">
 
-                <!-- Total Sessions -->
+                <!-- Total Records -->
                 <Border Grid.Column="0"
                         StrokeShape="RoundRectangle 12"
                         Stroke="{StaticResource Gray200}"

@@ -63,7 +63,7 @@ public partial class SessionListViewModel : ObservableObject
 
         HasData = _allEntries.Count > 0;
         StatusText = HasData
-            ? $"{_allEntries.Count} board results from {sessions.Count} sessions"
+            ? $"{_allEntries.Count} board results from {sessions.Count} records"
             : "Load data from Dashboard first.";
         ApplyFilters();
     }
