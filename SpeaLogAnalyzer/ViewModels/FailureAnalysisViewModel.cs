@@ -26,6 +26,9 @@ public partial class FailureAnalysisViewModel : ObservableObject
     private bool _hasSelection;
 
     [ObservableProperty]
+    private bool _isLoading;
+
+    [ObservableProperty]
     private string _statusText = "Load data from Dashboard first.";
 
     [ObservableProperty]
@@ -66,40 +69,64 @@ public partial class FailureAnalysisViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void Refresh()
+    private async Task Refresh()
     {
         var sessions = _dashboardVm.AllSessions;
-        _allMeasurements = sessions.SelectMany(s => s.Measurements).ToList();
+        if (sessions.Count == 0)
+        {
+            StatusText = "Load data from Dashboard first.";
+            HasData = false;
+            return;
+        }
 
-        var grouped = _allMeasurements
-            .Where(m => m.Result != TestResult.Pass && m.Result != TestResult.None)
-            .GroupBy(m => m.ComponentName)
-            .Select(g =>
+        IsLoading = true;
+        StatusText = "Analyzing failures...";
+
+        try
+        {
+            var allMeasurements = new List<TestMeasurement>();
+            var grouped = await Task.Run(() =>
             {
-                var all = _allMeasurements.Where(m => m.ComponentName == g.Key).ToList();
-                return new FailureRow
-                {
-                    ComponentName = g.Key,
-                    FailCount = g.Count(),
-                    TotalCount = all.Count,
-                    FailRate = all.Count > 0 ? Math.Round(g.Count() * 100.0 / all.Count, 1) : 0,
-                    Category = g.First().Category.ToString(),
-                    Description = g.First().Description,
-                    Unit = g.First().Unit
-                };
-            })
-            .OrderByDescending(r => r.FailCount)
-            .ToList();
+                allMeasurements = sessions.SelectMany(s => s.Measurements).ToList();
 
-        for (int i = 0; i < grouped.Count; i++)
-            grouped[i].Rank = i + 1;
+                var result = allMeasurements
+                    .Where(m => m.Result != TestResult.Pass && m.Result != TestResult.None)
+                    .GroupBy(m => m.ComponentName)
+                    .Select(g =>
+                    {
+                        var all = allMeasurements.Where(m => m.ComponentName == g.Key).ToList();
+                        return new FailureRow
+                        {
+                            ComponentName = g.Key,
+                            FailCount = g.Count(),
+                            TotalCount = all.Count,
+                            FailRate = all.Count > 0 ? Math.Round(g.Count() * 100.0 / all.Count, 1) : 0,
+                            Category = g.First().Category.ToString(),
+                            Description = g.First().Description,
+                            Unit = g.First().Unit
+                        };
+                    })
+                    .OrderByDescending(r => r.FailCount)
+                    .ToList();
 
-        FailureRows = grouped;
-        HasData = grouped.Count > 0;
-        StatusText = HasData
-            ? $"{grouped.Count} failing components from {sessions.Count} sessions"
-            : "No failures found.";
-        HasSelection = false;
+                for (int i = 0; i < result.Count; i++)
+                    result[i].Rank = i + 1;
+
+                return result;
+            });
+
+            _allMeasurements = allMeasurements;
+            FailureRows = grouped;
+            HasData = grouped.Count > 0;
+            StatusText = HasData
+                ? $"{grouped.Count} failing components from {sessions.Count} sessions"
+                : "No failures found.";
+            HasSelection = false;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     partial void OnSelectedFailureChanged(FailureRow? value)

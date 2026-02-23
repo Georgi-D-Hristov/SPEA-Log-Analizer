@@ -8,6 +8,8 @@
              Title="Failure Analysis"
              Background="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
 
+    <Grid>
+    <!-- Main content -->
     <Grid ColumnDefinitions="350,*" Padding="20" ColumnSpacing="16">
 
         <!-- Left Panel: Failure Table -->
@@ -197,5 +199,31 @@
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>
+    </Grid>
+
+    <!-- Loading overlay -->
+    <Grid IsVisible="{Binding IsLoading}"
+          BackgroundColor="#80000000"
+          ZIndex="100">
+        <Border StrokeShape="RoundRectangle 16"
+                Stroke="{StaticResource Gray200}"
+                StrokeThickness="1"
+                BackgroundColor="White"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                Padding="40,30"
+                Shadow="{Shadow Brush=#30000000, Offset='0,4', Radius=16, Opacity=0.3}">
+            <VerticalStackLayout Spacing="16" HorizontalOptions="Center">
+                <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                   Color="{StaticResource Primary}"
+                                   HeightRequest="48"
+                                   WidthRequest="48" />
+                <Label Text="Analyzing failures..."
+                       FontSize="15"
+                       TextColor="#555555"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
     </Grid>
 </ContentPage>
