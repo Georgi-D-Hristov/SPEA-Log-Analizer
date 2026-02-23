@@ -98,4 +98,32 @@ public class StatisticsService : IStatisticsService
             .OrderByDescending(x => x.SessionCount)
             .ToList();
     }
+
+    public int GetRetestBoardCount(List<TestSession> sessions)
+    {
+        var allBoards = sessions
+            .SelectMany(s => s.BoardResults)
+            .Where(b => b.Result != TestResult.None && !string.IsNullOrWhiteSpace(b.SerialNumber));
+
+        var grouped = allBoards.GroupBy(b => b.SerialNumber);
+        return grouped.Count(g => g.Count() > 1);
+    }
+
+    public void CalculateRetestCounts(List<TestSession> sessions)
+    {
+        // Count how many times each serial appears across all sessions
+        var allBoards = sessions
+            .SelectMany(s => s.BoardResults)
+            .Where(b => b.Result != TestResult.None && !string.IsNullOrWhiteSpace(b.SerialNumber))
+            .ToList();
+
+        var countBySerial = allBoards
+            .GroupBy(b => b.SerialNumber)
+            .ToDictionary(g => g.Key, g => g.Count() - 1); // retestCount = appearances - 1
+
+        foreach (var board in allBoards)
+        {
+            board.RetestCount = countBySerial.GetValueOrDefault(board.SerialNumber, 0);
+        }
+    }
 }

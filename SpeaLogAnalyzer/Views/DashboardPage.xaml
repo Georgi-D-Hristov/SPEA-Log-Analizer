@@ -126,6 +126,24 @@
                         </HorizontalStackLayout>
                     </Grid>
 
+                    <!-- Second filter row: Exclude duplicates + Retest counter -->
+                    <HorizontalStackLayout Spacing="16" VerticalOptions="Center">
+                        <CheckBox IsChecked="{Binding ExcludeDuplicateSerials}"
+                                  Color="{StaticResource Primary}"
+                                  VerticalOptions="Center" />
+                        <Label Text="Exclude duplicate serial numbers (keep last test only)"
+                               FontSize="12"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}" />
+                        <BoxView WidthRequest="1" HeightRequest="20" Color="{StaticResource Gray200}" VerticalOptions="Center" />
+                        <Label FontSize="12" VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}">
+                            <Label.Text>
+                                <Binding Path="RetestedBoardsCount" StringFormat="🔁 Retested boards: {0}" />
+                            </Label.Text>
+                        </Label>
+                    </HorizontalStackLayout>
+
                     <!-- Filter Summary -->
                     <Label Text="{Binding FilterSummary}"
                            FontSize="11"
@@ -146,7 +164,7 @@
                         Background="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}"
                         Padding="16">
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Sessions" FontSize="13" TextColor="{StaticResource Gray400}" />
+                        <Label Text="Log Files" FontSize="13" TextColor="{StaticResource Gray400}" />
                         <Label Text="{Binding TotalSessions}" FontSize="32" FontAttributes="Bold" />
                     </VerticalStackLayout>
                 </Border>

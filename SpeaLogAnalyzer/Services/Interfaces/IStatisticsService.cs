@@ -13,4 +13,6 @@ public interface IStatisticsService
     Dictionary<TestCategory, int> GetFailuresByCategory(List<TestSession> sessions);
     List<(string Operator, int SessionCount)> GetOperatorStats(List<TestSession> sessions);
     List<(string FixtureId, int SessionCount, double YieldPercent)> GetFixtureStats(List<TestSession> sessions);
+    int GetRetestBoardCount(List<TestSession> sessions);
+    void CalculateRetestCounts(List<TestSession> sessions);
 }

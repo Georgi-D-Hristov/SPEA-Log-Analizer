@@ -9,23 +9,30 @@
              Title="Sessions"
              Background="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
 
-    <Grid RowDefinitions="Auto,Auto,*" Padding="20" RowSpacing="12">
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="20" RowSpacing="12">
 
         <!-- Header -->
-        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
             <Label Text="Test Sessions"
                    FontSize="24"
                    FontAttributes="Bold"
                    VerticalOptions="Center" />
 
             <Picker Grid.Column="1"
+                    Title="Position"
+                    ItemsSource="{Binding PositionFilterOptions}"
+                    SelectedItem="{Binding SelectedPositionFilter}"
+                    WidthRequest="100"
+                    VerticalOptions="Center" />
+
+            <Picker Grid.Column="2"
                     Title="Result"
                     ItemsSource="{Binding ResultFilterOptions}"
                     SelectedItem="{Binding SelectedResultFilter}"
-                    WidthRequest="120"
+                    WidthRequest="100"
                     VerticalOptions="Center" />
 
-            <Button Grid.Column="2"
+            <Button Grid.Column="3"
                     Text="🔄 Refresh"
                     Command="{Binding RefreshCommand}"
                     BackgroundColor="{StaticResource Primary}"
@@ -38,19 +45,25 @@
         <!-- Search -->
         <SearchBar Grid.Row="1"
                    Text="{Binding SearchText}"
-                   Placeholder="Search by filename, fixture, operator, serial..."
+                   Placeholder="Search by serial number, filename, fixture, operator..."
                    BackgroundColor="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}" />
 
-        <!-- Session List -->
-        <CollectionView Grid.Row="2"
-                        ItemsSource="{Binding FilteredSessions}"
+        <!-- Status -->
+        <Label Grid.Row="2"
+               Text="{Binding StatusText}"
+               FontSize="12"
+               TextColor="{StaticResource Gray400}" />
+
+        <!-- Session Board List -->
+        <CollectionView Grid.Row="3"
+                        ItemsSource="{Binding FilteredEntries}"
                         SelectionMode="Single"
                         SelectionChangedCommand="{Binding NavigateToDetailCommand}"
                         SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
             <CollectionView.EmptyView>
                 <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
                     <Label Text="📋" FontSize="48" HorizontalOptions="Center" />
-                    <Label Text="{Binding StatusText}"
+                    <Label Text="No results found"
                            FontSize="16"
                            TextColor="{StaticResource Gray400}"
                            HorizontalOptions="Center" />
@@ -58,56 +71,95 @@
             </CollectionView.EmptyView>
 
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:TestSession">
+                <DataTemplate x:DataType="models:SessionBoardEntry">
                     <Border StrokeShape="RoundRectangle 10"
                             Stroke="{StaticResource Gray200}"
                             StrokeThickness="1"
                             Background="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}"
-                            Padding="16"
-                            Margin="0,4">
-                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="16">
+                            Padding="0"
+                            Margin="0,3">
+                        <Grid ColumnDefinitions="6,*,Auto" ColumnSpacing="0">
 
-                            <!-- Result Indicator -->
-                            <Border Grid.Column="0"
-                                    WidthRequest="8"
-                                    HeightRequest="50"
-                                    StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 4"
-                                    Background="{Binding OverallResult, Converter={StaticResource ResultToColorConverter}}"
-                                    VerticalOptions="Center" />
+                            <!-- Color strip -->
+                            <BoxView Grid.Column="0"
+                                     Color="{Binding Result, Converter={StaticResource ResultToColorConverter}}"
+                                     WidthRequest="6"
+                                     VerticalOptions="Fill" />
 
-                            <!-- Session Info -->
-                            <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
-                                <Label FontSize="14" FontAttributes="Bold">
+                            <!-- Main content -->
+                            <Grid Grid.Column="1"
+                                  ColumnDefinitions="200,120,*,Auto"
+                                  RowDefinitions="Auto,Auto"
+                                  Padding="12,10"
+                                  ColumnSpacing="16"
+                                  RowSpacing="2">
+
+                                <!-- Serial Number (prominent) -->
+                                <Label Text="{Binding SerialNumber}"
+                                       FontSize="15"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#111111, Dark=#FFFFFF}"
+                                       VerticalOptions="Center" />
+
+                                <!-- Position badge -->
+                                <Border Grid.Column="1"
+                                        StrokeShape="RoundRectangle 6"
+                                        StrokeThickness="1"
+                                        Stroke="{StaticResource Gray200}"
+                                        Background="{AppThemeBinding Light=#F0F0F0, Dark=#3A3A3A}"
+                                        Padding="8,3"
+                                        VerticalOptions="Center"
+                                        HorizontalOptions="Start">
+                                    <Label Text="{Binding PositionDisplay}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#333333, Dark=#E0E0E0}" />
+                                </Border>
+
+                                <!-- Date + Fixture -->
+                                <Label Grid.Column="2" FontSize="13"
+                                       TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"
+                                       VerticalOptions="Center">
                                     <Label.Text>
-                                        <MultiBinding StringFormat="{}{0} — {1}">
-                                            <Binding Path="StartTime" StringFormat="{}{0:yyyy-MM-dd HH:mm}" />
+                                        <MultiBinding StringFormat="{}{0:yyyy-MM-dd HH:mm:ss} | {1} | {2}">
+                                            <Binding Path="StartTime" />
                                             <Binding Path="FixtureId" />
+                                            <Binding Path="Operator" />
                                         </MultiBinding>
                                     </Label.Text>
                                 </Label>
-                                <Label Text="{Binding Operator, StringFormat='Operator: {0}'}"
-                                       FontSize="12"
-                                       TextColor="{StaticResource Gray400}" />
-                                <Label Text="{Binding FileName}"
-                                       FontSize="11"
+
+                                <!-- Retest indicator -->
+                                <HorizontalStackLayout Grid.Column="3" Spacing="4" VerticalOptions="Center"
+                                                       IsVisible="{Binding IsRetested}">
+                                    <Border StrokeShape="RoundRectangle 6"
+                                            StrokeThickness="0"
+                                            Background="#FF9800"
+                                            Padding="8,3">
+                                        <Label Text="{Binding RetestDisplay}"
+                                               FontSize="11"
+                                               FontAttributes="Bold"
+                                               TextColor="White" />
+                                    </Border>
+                                </HorizontalStackLayout>
+
+                                <!-- Second row: filename -->
+                                <Label Grid.Row="1" Grid.ColumnSpan="4"
+                                       Text="{Binding FileName}"
+                                       FontSize="10"
                                        TextColor="{StaticResource Gray300}" />
-                            </VerticalStackLayout>
+                            </Grid>
 
-                            <!-- Board Results -->
-                            <HorizontalStackLayout Grid.Column="2" Spacing="6" VerticalOptions="Center">
-                                <Label Text="{Binding PassedBoards, StringFormat='✅ {0}'}" FontSize="13" TextColor="{StaticResource PassColor}" />
-                                <Label Text="{Binding FailedBoards, StringFormat='❌ {0}'}" FontSize="13" TextColor="{StaticResource FailColor}" />
-                            </HorizontalStackLayout>
-
-                            <!-- Overall Result -->
-                            <Border Grid.Column="3"
+                            <!-- Result badge -->
+                            <Border Grid.Column="2"
                                     StrokeShape="RoundRectangle 8"
                                     StrokeThickness="0"
-                                    Background="{Binding OverallResult, Converter={StaticResource ResultToColorConverter}}"
-                                    Padding="12,6"
-                                    VerticalOptions="Center">
-                                <Label Text="{Binding OverallResultDisplay}"
+                                    Background="{Binding Result, Converter={StaticResource ResultToColorConverter}}"
+                                    Padding="14,6"
+                                    Margin="0,0,12,0"
+                                    VerticalOptions="Center"
+                                    HorizontalOptions="End">
+                                <Label Text="{Binding ResultDisplay}"
                                        FontSize="13"
                                        FontAttributes="Bold"
                                        TextColor="White" />

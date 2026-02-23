@@ -96,6 +96,12 @@ public partial class DashboardViewModel : ObservableObject
     [ObservableProperty]
     private string _filterSummary = string.Empty;
 
+    [ObservableProperty]
+    private bool _excludeDuplicateSerials;
+
+    [ObservableProperty]
+    private int _retestedBoardsCount;
+
     public DashboardViewModel(ILogParserService logParser, IStatisticsService statistics)
     {
         _logParser = logParser;
@@ -203,6 +209,44 @@ public partial class DashboardViewModel : ObservableObject
 
         _filteredSessions = filtered.ToList();
 
+        // Calculate retest counts across filtered sessions
+        _statistics.CalculateRetestCounts(_filteredSessions);
+        RetestedBoardsCount = _statistics.GetRetestBoardCount(_filteredSessions);
+
+        if (ExcludeDuplicateSerials)
+        {
+            // Keep only the last test for each serial number
+            var seen = new HashSet<string>();
+            var deduped = new List<TestSession>();
+
+            foreach (var session in _filteredSessions.OrderByDescending(s => s.StartTime))
+            {
+                var clone = new TestSession
+                {
+                    FileName = session.FileName,
+                    FilePath = session.FilePath,
+                    Site = session.Site,
+                    Program = session.Program,
+                    FixtureId = session.FixtureId,
+                    Operator = session.Operator,
+                    StartTime = session.StartTime,
+                    EndTime = session.EndTime,
+                    OverallResult = session.OverallResult,
+                    Measurements = session.Measurements,
+                    BoardResults = session.BoardResults
+                        .Where(b => b.Result == TestResult.None ||
+                                    string.IsNullOrWhiteSpace(b.SerialNumber) ||
+                                    seen.Add(b.SerialNumber))
+                        .ToList()
+                };
+
+                if (clone.BoardResults.Any(b => b.Result != TestResult.None))
+                    deduped.Add(clone);
+            }
+
+            _filteredSessions = deduped.OrderBy(s => s.StartTime).ToList();
+        }
+
         UpdateStatistics();
         BuildCharts();
 
@@ -214,6 +258,9 @@ public partial class DashboardViewModel : ObservableObject
 
         if (!string.IsNullOrEmpty(SelectedVariant) && SelectedVariant != "All")
             parts.Add($"Variant: {SelectedVariant}");
+
+        if (ExcludeDuplicateSerials)
+            parts.Add("Unique SNs only");
 
         FilterSummary = $"Filter: {string.Join(" | ", parts)} — {_filteredSessions.Count}/{_allSessions.Count} sessions";
     }

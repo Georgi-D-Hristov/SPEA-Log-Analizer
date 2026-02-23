@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SpeaLogAnalyzer.Models;
@@ -7,10 +8,10 @@ namespace SpeaLogAnalyzer.ViewModels;
 public partial class SessionListViewModel : ObservableObject
 {
     private readonly DashboardViewModel _dashboardVm;
-    private List<TestSession> _allSessions = [];
+    private List<SessionBoardEntry> _allEntries = [];
 
     [ObservableProperty]
-    private List<TestSession> _filteredSessions = [];
+    private List<SessionBoardEntry> _filteredEntries = [];
 
     [ObservableProperty]
     private string _searchText = string.Empty;
@@ -19,10 +20,16 @@ public partial class SessionListViewModel : ObservableObject
     private string _selectedResultFilter = "All";
 
     [ObservableProperty]
+    private string _selectedPositionFilter = "All";
+
+    [ObservableProperty]
     private bool _hasData;
 
     [ObservableProperty]
     private string _statusText = "Load data from Dashboard first.";
+
+    [ObservableProperty]
+    private ObservableCollection<string> _positionFilterOptions = ["All"];
 
     public List<string> ResultFilterOptions { get; } = ["All", "PASS", "FAIL"];
 
@@ -34,47 +41,73 @@ public partial class SessionListViewModel : ObservableObject
     [RelayCommand]
     private void Refresh()
     {
-        _allSessions = _dashboardVm.AllSessions;
-        HasData = _allSessions.Count > 0;
+        var sessions = _dashboardVm.AllSessions;
+
+        _allEntries = sessions
+            .SelectMany(s => s.BoardResults
+                .Where(b => b.Result != TestResult.None)
+                .Select(b => new SessionBoardEntry { Session = s, Board = b }))
+            .OrderByDescending(e => e.StartTime)
+            .ToList();
+
+        // Build position filter options
+        var positions = _allEntries
+            .Select(e => e.Channel)
+            .Distinct()
+            .OrderBy(c => c)
+            .Select(c => $"Pos {c}")
+            .ToList();
+
+        PositionFilterOptions = new ObservableCollection<string>(["All", .. positions]);
+        SelectedPositionFilter = "All";
+
+        HasData = _allEntries.Count > 0;
         StatusText = HasData
-            ? $"{_allSessions.Count} sessions loaded"
+            ? $"{_allEntries.Count} board results from {sessions.Count} sessions"
             : "Load data from Dashboard first.";
         ApplyFilters();
     }
 
     partial void OnSearchTextChanged(string value) => ApplyFilters();
     partial void OnSelectedResultFilterChanged(string value) => ApplyFilters();
+    partial void OnSelectedPositionFilterChanged(string value) => ApplyFilters();
 
     private void ApplyFilters()
     {
-        var query = _allSessions.AsEnumerable();
+        var query = _allEntries.AsEnumerable();
 
         if (!string.IsNullOrWhiteSpace(SearchText))
         {
-            var search = SearchText.Trim().ToUpperInvariant();
-            query = query.Where(s =>
-                s.FileName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                s.FixtureId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                s.Operator.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                s.BoardResults.Any(b => b.SerialNumber.Contains(search, StringComparison.OrdinalIgnoreCase)));
+            var search = SearchText.Trim();
+            query = query.Where(e =>
+                e.SerialNumber.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                e.FileName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                e.FixtureId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                e.Operator.Contains(search, StringComparison.OrdinalIgnoreCase));
         }
 
         if (SelectedResultFilter == "PASS")
-            query = query.Where(s => s.OverallResult == TestResult.Pass);
+            query = query.Where(e => e.Result == TestResult.Pass);
         else if (SelectedResultFilter == "FAIL")
-            query = query.Where(s => s.OverallResult == TestResult.Fail);
+            query = query.Where(e => e.Result != TestResult.Pass && e.Result != TestResult.None);
 
-        FilteredSessions = query.OrderByDescending(s => s.StartTime).ToList();
+        if (!string.IsNullOrEmpty(SelectedPositionFilter) && SelectedPositionFilter != "All")
+        {
+            if (int.TryParse(SelectedPositionFilter.Replace("Pos ", ""), out int pos))
+                query = query.Where(e => e.Channel == pos);
+        }
+
+        FilteredEntries = query.ToList();
     }
 
     [RelayCommand]
-    private async Task NavigateToDetail(TestSession? session)
+    private async Task NavigateToDetail(SessionBoardEntry? entry)
     {
-        if (session is null) return;
+        if (entry?.Session is null) return;
 
         var navParams = new Dictionary<string, object>
         {
-            { "Session", session }
+            { "Session", entry.Session }
         };
 
         await Shell.Current.GoToAsync(nameof(Views.SessionDetailPage), navParams);
