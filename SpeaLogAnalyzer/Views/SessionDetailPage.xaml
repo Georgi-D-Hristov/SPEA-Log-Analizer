@@ -5,7 +5,7 @@
              xmlns:models="clr-namespace:SpeaLogAnalyzer.Models"
              x:Class="SpeaLogAnalyzer.Views.SessionDetailPage"
              x:DataType="vm:SessionDetailViewModel"
-             Title="Session Detail"
+             Title="Record Detail"
              Background="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
 
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="20" RowSpacing="12">
