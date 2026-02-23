@@ -10,7 +10,12 @@
 
     <Grid>
     <!-- Main content -->
-    <Grid ColumnDefinitions="350,*" Padding="20" ColumnSpacing="16">
+    <Grid x:Name="MainGrid" Padding="20" ColumnSpacing="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="LeftColumn" Width="350" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
         <!-- Left Panel: Failure Table -->
         <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
@@ -112,8 +117,19 @@
             </Border>
         </Grid>
 
+        <!-- Splitter -->
+        <BoxView x:Name="Splitter"
+                 Grid.Column="1"
+                 WidthRequest="8"
+                 BackgroundColor="Transparent"
+                 Cursor="SizeWestEast">
+            <BoxView.GestureRecognizers>
+                <PanGestureRecognizer PanUpdated="OnSplitterPanUpdated" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
         <!-- Right Panel: Charts -->
-        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*,*,Auto" RowSpacing="12">
+        <Grid Grid.Column="2" RowDefinitions="Auto,Auto,*,*,Auto" RowSpacing="12">
 
             <!-- Selection Title -->
             <Label Text="{Binding SelectionTitle}"
@@ -137,15 +153,35 @@
                     Padding="16"
                     IsVisible="{Binding HasSelection}">
                 <VerticalStackLayout>
-                    <Label Text="📊 Histogram — Value Distribution"
-                           FontSize="14"
-                           FontAttributes="Bold"
-                           Margin="0,0,0,6" />
-                    <lvc:CartesianChart Series="{Binding HistogramSeries}"
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,6">
+                        <Label Text="📊 Histogram — Value Distribution"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center" />
+                        <Button Grid.Column="1"
+                                Text="⟲ Reset Zoom"
+                                FontSize="10"
+                                HeightRequest="28"
+                                Padding="8,0"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource Primary}"
+                                BorderColor="{StaticResource Primary}"
+                                BorderWidth="1"
+                                CornerRadius="6"
+                                Clicked="OnResetHistogramZoom" />
+                    </Grid>
+                    <lvc:CartesianChart x:Name="HistogramChart"
+                                        Series="{Binding HistogramSeries}"
                                         XAxes="{Binding HistogramXAxes}"
                                         YAxes="{Binding HistogramYAxes}"
                                         Sections="{Binding HistogramSections}"
+                                        ZoomMode="Both"
                                         HeightRequest="250" />
+                    <Label Text="🖱 Scroll to zoom · Drag to pan"
+                           FontSize="9"
+                           TextColor="{StaticResource Gray400}"
+                           HorizontalOptions="End"
+                           Margin="0,2,4,0" />
                 </VerticalStackLayout>
             </Border>
 
@@ -158,15 +194,35 @@
                     Padding="16"
                     IsVisible="{Binding HasSelection}">
                 <VerticalStackLayout>
-                    <Label Text="🔵 Scatter Plot — All Measurements"
-                           FontSize="14"
-                           FontAttributes="Bold"
-                           Margin="0,0,0,6" />
-                    <lvc:CartesianChart Series="{Binding ScatterSeries}"
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,6">
+                        <Label Text="🔵 Scatter Plot — All Measurements"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center" />
+                        <Button Grid.Column="1"
+                                Text="⟲ Reset Zoom"
+                                FontSize="10"
+                                HeightRequest="28"
+                                Padding="8,0"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource Primary}"
+                                BorderColor="{StaticResource Primary}"
+                                BorderWidth="1"
+                                CornerRadius="6"
+                                Clicked="OnResetScatterZoom" />
+                    </Grid>
+                    <lvc:CartesianChart x:Name="ScatterChart"
+                                        Series="{Binding ScatterSeries}"
                                         XAxes="{Binding ScatterXAxes}"
                                         YAxes="{Binding ScatterYAxes}"
                                         Sections="{Binding ScatterSections}"
+                                        ZoomMode="Both"
                                         HeightRequest="250" />
+                    <Label Text="🖱 Scroll to zoom · Drag to pan"
+                           FontSize="9"
+                           TextColor="{StaticResource Gray400}"
+                           HorizontalOptions="End"
+                           Margin="0,2,4,0" />
                 </VerticalStackLayout>
             </Border>
 
