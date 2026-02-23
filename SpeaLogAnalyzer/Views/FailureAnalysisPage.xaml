@@ -121,8 +121,7 @@
         <BoxView x:Name="Splitter"
                  Grid.Column="1"
                  WidthRequest="8"
-                 BackgroundColor="Transparent"
-                 Cursor="SizeWestEast">
+                 BackgroundColor="#E0E0E0">
             <BoxView.GestureRecognizers>
                 <PanGestureRecognizer PanUpdated="OnSplitterPanUpdated" />
             </BoxView.GestureRecognizers>
@@ -267,8 +266,10 @@
                 BackgroundColor="White"
                 HorizontalOptions="Center"
                 VerticalOptions="Center"
-                Padding="40,30"
-                Shadow="{Shadow Brush=#30000000, Offset='0,4', Radius=16, Opacity=0.3}">
+                Padding="40,30">
+            <Border.Shadow>
+                <Shadow Brush="#30000000" Offset="0,4" Radius="16" Opacity="0.3" />
+            </Border.Shadow>
             <VerticalStackLayout Spacing="16" HorizontalOptions="Center">
                 <ActivityIndicator IsRunning="{Binding IsLoading}"
                                    Color="{StaticResource Primary}"
