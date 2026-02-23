@@ -16,6 +16,7 @@ public class TestMeasurement
     public string TestPoints { get; set; } = string.Empty;
     public string TestId { get; set; } = string.Empty;
     public TestCategory Category { get; set; }
+    public DateTime SessionTime { get; set; }
 
     public bool HasNoLowLimit => LowLimit <= -1e9;
     public bool HasNoHighLimit => HighLimit >= 1e9;

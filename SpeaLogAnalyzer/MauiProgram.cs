@@ -32,11 +32,13 @@ public static class MauiProgram
 		// ViewModels
 		builder.Services.AddSingleton<DashboardViewModel>();
 		builder.Services.AddSingleton<SessionListViewModel>();
+		builder.Services.AddSingleton<FailureAnalysisViewModel>();
 		builder.Services.AddTransient<SessionDetailViewModel>();
 
 		// Views
 		builder.Services.AddSingleton<DashboardPage>();
 		builder.Services.AddSingleton<SessionListPage>();
+		builder.Services.AddSingleton<FailureAnalysisPage>();
 		builder.Services.AddTransient<SessionDetailPage>();
 
 #if DEBUG

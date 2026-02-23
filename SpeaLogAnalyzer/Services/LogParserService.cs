@@ -128,6 +128,7 @@ public class LogParserService : ILogParserService
         };
 
         measurement.Category = DetermineCategory(measurement.Description, recordType);
+        measurement.SessionTime = session.StartTime;
         session.Measurements.Add(measurement);
     }
 

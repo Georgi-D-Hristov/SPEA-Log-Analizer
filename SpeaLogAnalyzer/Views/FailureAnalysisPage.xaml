@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SpeaLogAnalyzer.ViewModels"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui"
+             x:Class="SpeaLogAnalyzer.Views.FailureAnalysisPage"
+             x:DataType="vm:FailureAnalysisViewModel"
+             Title="Failure Analysis"
+             Background="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
+
+    <Grid ColumnDefinitions="350,*" Padding="20" ColumnSpacing="16">
+
+        <!-- Left Panel: Failure Table -->
+        <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+
+            <!-- Header -->
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="Failure Pareto"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
+                <Button Grid.Column="1"
+                        Text="🔄 Refresh"
+                        Command="{Binding RefreshCommand}"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"
+                        HeightRequest="36"
+                        Padding="14,0"
+                        FontSize="12"
+                        VerticalOptions="Center" />
+            </Grid>
+
+            <Label Grid.Row="1"
+                   Text="{Binding StatusText}"
+                   FontSize="11"
+                   TextColor="{StaticResource Gray400}" />
+
+            <!-- Failure List -->
+            <Border Grid.Row="2"
+                    StrokeShape="RoundRectangle 10"
+                    Stroke="{StaticResource Gray200}"
+                    StrokeThickness="1"
+                    Background="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}">
+                <Grid RowDefinitions="Auto,*">
+
+                    <!-- Table Header -->
+                    <Grid ColumnDefinitions="40,*,60,60,60"
+                          Padding="10,8"
+                          BackgroundColor="{StaticResource Primary}"
+                          ColumnSpacing="4">
+                        <Label Text="#" FontSize="11" FontAttributes="Bold" TextColor="White" />
+                        <Label Grid.Column="1" Text="Component" FontSize="11" FontAttributes="Bold" TextColor="White" />
+                        <Label Grid.Column="2" Text="Fails" FontSize="11" FontAttributes="Bold" TextColor="White" HorizontalTextAlignment="Center" />
+                        <Label Grid.Column="3" Text="Total" FontSize="11" FontAttributes="Bold" TextColor="White" HorizontalTextAlignment="Center" />
+                        <Label Grid.Column="4" Text="Rate" FontSize="11" FontAttributes="Bold" TextColor="White" HorizontalTextAlignment="Center" />
+                    </Grid>
+
+                    <!-- Table Body -->
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding FailureRows}"
+                                    SelectionMode="Single"
+                                    SelectionChangedCommand="{Binding SelectFailureCommand}"
+                                    SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:FailureRow">
+                                <Border StrokeThickness="0"
+                                        Padding="0"
+                                        Margin="0,0,0,1"
+                                        BackgroundColor="{AppThemeBinding Light=White, Dark=#2D2D2D}">
+                                    <Grid ColumnDefinitions="40,*,60,60,60"
+                                          Padding="10,7"
+                                          ColumnSpacing="4">
+                                        <Label Text="{Binding Rank}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}" />
+                                        <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                            <Label Text="{Binding ComponentName}"
+                                                   FontSize="12"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{AppThemeBinding Light=#111111, Dark=#FFFFFF}"
+                                                   LineBreakMode="TailTruncation" />
+                                            <Label Text="{Binding Description}"
+                                                   FontSize="9"
+                                                   TextColor="{StaticResource Gray400}"
+                                                   LineBreakMode="TailTruncation" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="2"
+                                               Text="{Binding FailCount}"
+                                               FontSize="12"
+                                               TextColor="{StaticResource FailColor}"
+                                               FontAttributes="Bold"
+                                               HorizontalTextAlignment="Center" />
+                                        <Label Grid.Column="3"
+                                               Text="{Binding TotalCount}"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"
+                                               HorizontalTextAlignment="Center" />
+                                        <Label Grid.Column="4"
+                                               Text="{Binding FailRateDisplay}"
+                                               FontSize="12"
+                                               TextColor="{StaticResource FailColor}"
+                                               HorizontalTextAlignment="Center" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Right Panel: Charts -->
+        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*,*,Auto" RowSpacing="12">
+
+            <!-- Selection Title -->
+            <Label Text="{Binding SelectionTitle}"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   IsVisible="{Binding HasSelection}" />
+
+            <!-- Selection Stats -->
+            <Label Grid.Row="1"
+                   Text="{Binding SelectionStats}"
+                   FontSize="11"
+                   TextColor="{StaticResource Gray400}"
+                   IsVisible="{Binding HasSelection}" />
+
+            <!-- Histogram -->
+            <Border Grid.Row="2"
+                    StrokeShape="RoundRectangle 10"
+                    Stroke="{StaticResource Gray200}"
+                    StrokeThickness="1"
+                    Background="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}"
+                    Padding="16"
+                    IsVisible="{Binding HasSelection}">
+                <VerticalStackLayout>
+                    <Label Text="📊 Histogram — Value Distribution"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           Margin="0,0,0,6" />
+                    <lvc:CartesianChart Series="{Binding HistogramSeries}"
+                                        XAxes="{Binding HistogramXAxes}"
+                                        YAxes="{Binding HistogramYAxes}"
+                                        Sections="{Binding HistogramSections}"
+                                        HeightRequest="250" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Scatter Plot -->
+            <Border Grid.Row="3"
+                    StrokeShape="RoundRectangle 10"
+                    Stroke="{StaticResource Gray200}"
+                    StrokeThickness="1"
+                    Background="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}"
+                    Padding="16"
+                    IsVisible="{Binding HasSelection}">
+                <VerticalStackLayout>
+                    <Label Text="🔵 Scatter Plot — All Measurements"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           Margin="0,0,0,6" />
+                    <lvc:CartesianChart Series="{Binding ScatterSeries}"
+                                        XAxes="{Binding ScatterXAxes}"
+                                        YAxes="{Binding ScatterYAxes}"
+                                        Sections="{Binding ScatterSections}"
+                                        HeightRequest="250" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Limit change history -->
+            <Border Grid.Row="4" Grid.ColumnSpan="2"
+                    StrokeShape="RoundRectangle 10"
+                    Stroke="#FF9800"
+                    StrokeThickness="1"
+                    Background="#FFF3E0"
+                    Padding="12"
+                    Margin="0,4,0,0"
+                    IsVisible="{Binding HasLimitChanges}">
+                <Label Text="{Binding LimitHistoryText}"
+                       FontSize="12"
+                       FontFamily="Consolas"
+                       TextColor="#333333"
+                       LineBreakMode="WordWrap" />
+            </Border>
+
+            <!-- Empty state -->
+            <VerticalStackLayout Grid.Row="2" Grid.RowSpan="2"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center"
+                                 Spacing="8"
+                                 IsVisible="{Binding HasSelection, Converter={StaticResource InverseBoolConverter}}">
+                <Label Text="📈" FontSize="64" HorizontalOptions="Center" />
+                <Label Text="Select a component from the table to view charts"
+                       FontSize="15"
+                       TextColor="{StaticResource Gray400}"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -36,6 +36,13 @@
             Route="SessionListPage" />
     </FlyoutItem>
 
+    <FlyoutItem Title="Failure Analysis" Icon="{x:Null}">
+        <ShellContent
+            Title="Failure Analysis"
+            ContentTemplate="{DataTemplate views:FailureAnalysisPage}"
+            Route="FailureAnalysisPage" />
+    </FlyoutItem>
+
     <Shell.FlyoutFooter>
         <Grid HeightRequest="50" Padding="15">
             <Label Text="BHTC Bulgaria © 2026"
